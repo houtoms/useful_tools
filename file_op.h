@@ -6,18 +6,19 @@
 #include <stdlib.h>
 using namespace std;
 
-long file_load(string filename, char *&buffer)
+size_t file_load(string filename, char *&buffer)
 {
     filebuf *pbuf;
     ifstream filestr;
-    long size;
+    size_t size;
     filestr.open (filename.c_str(), ios::binary);
     pbuf = filestr.rdbuf();
     size = pbuf->pubseekoff(0,ios::end,ios::in);
     pbuf->pubseekpos(0,ios::in);
-    buffer = new char[size];
+    buffer = new char[size+1];
     pbuf->sgetn(buffer,size);
     filestr.close();
+    buffer[size] = '\0';
     return size;
 }
 
