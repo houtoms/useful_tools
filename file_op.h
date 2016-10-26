@@ -22,6 +22,39 @@ size_t file_load(string filename, char *&buffer)
     return size;
 }
 
+size_t file_load_no_linesep(string filename, char *&buffer)
+{
+    filebuf *pbuf;
+    ifstream filestr;
+    size_t size;
+    filestr.open (filename.c_str(), ios::binary);
+    pbuf = filestr.rdbuf();
+    size = pbuf->pubseekoff(0,ios::end,ios::in);
+    pbuf->pubseekpos(0,ios::in);
+    buffer = new char[size+1];
+    pbuf->sgetn(buffer,size);
+    filestr.close();
+    buffer[size] = '\0';
+
+    // remove line breaks
+    size_t cur = 0;
+    size_t new_size = size;
+    for(size_t i = cur; i < size; i++)
+    {
+        if(((int)buffer[i])==10) // new line ascii 
+        {
+            new_size--;
+            continue;
+        } else
+        {
+            buffer[cur] = buffer[i];
+            cur++;
+        }
+    }
+    buffer[cur] = '\0';
+    return new_size;
+}
+
 void analyze_file(char *buf, long size, int *&seg_start, int *&seg_length, int &seg_num)
 {
     buf[size-1] = '\0';
